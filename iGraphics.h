@@ -188,6 +188,12 @@ void iShowBMP2(int x, int y, char filename[], int ignoreColor)
     int  width, height, n;
     stbi_set_flip_vertically_on_load(1);
     unsigned char* image = stbi_load(filename, &width, &height, &n, 4);
+    if (image == NULL)
+    {
+        // missing or broken image file: skip it instead of crashing
+        printf("iShowBMP2: could not load %s\n", filename);
+        return;
+    }
 
     int nPixels = width * height;
     int *rgPixels = new int[nPixels];

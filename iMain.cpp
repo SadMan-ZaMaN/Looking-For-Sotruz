@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MAX_NAME_LENGTH 500
+#define MAX_NAME_LENGTH 30
 #define MAX_HIGH_SCORES 5
 
 char userInput[MAX_NAME_LENGTH];
@@ -16,7 +16,7 @@ bool inputMode = false;
 
 struct hscore
 {
-    char myname[30];
+    char myname[MAX_NAME_LENGTH];
     int score;
 } high_score[MAX_HIGH_SCORES];
 
@@ -40,7 +40,33 @@ int heroCorY = heroCordinateY;
 int heroIndex = 0;
 char herowalk[8][30] = {"HeroMovement\\Run\\w0.bmp", "HeroMovement\\Run\\w1.bmp", "HeroMovement\\Run\\w2.bmp", "HeroMovement\\Run\\w3.bmp", "HeroMovement\\Run\\w4.bmp", "HeroMovement\\Run\\w5.bmp", "HeroMovement\\Run\\w6.bmp", "HeroMovement\\Run\\w7.bmp"};
 char leftwalk[8][30] = {"HeroMovement\\Run\\l0.bmp", "HeroMovement\\Run\\l1.bmp", "HeroMovement\\Run\\l2.bmp", "HeroMovement\\Run\\l3.bmp", "HeroMovement\\Run\\l4.bmp", "HeroMovement\\Run\\l5.bmp", "HeroMovement\\Run\\l6.bmp", "HeroMovement\\Run\\l7.bmp"};
-bool Menumusic = true;
+
+#define MUSIC_NONE 0
+#define MUSIC_MENU 1
+#define MUSIC_ENDING 2
+int currentMusic = MUSIC_NONE;
+
+// iDraw runs every frame, so only start a track when it changes (otherwise it restarts every frame)
+void playMusic(int track)
+{
+    if (track == currentMusic)
+    {
+        return;
+    }
+    currentMusic = track;
+    if (track == MUSIC_MENU)
+    {
+        PlaySound("Music\\Menu_BGM.wav", NULL, SND_FILENAME | SND_LOOP | SND_ASYNC);
+    }
+    else if (track == MUSIC_ENDING)
+    {
+        PlaySound("Music\\WhatIHaveDone1.wav", NULL, SND_FILENAME | SND_ASYNC);
+    }
+    else
+    {
+        PlaySound(NULL, NULL, 0);
+    }
+}
 
 struct buttonCordinate
 {
@@ -82,19 +108,20 @@ int cannon_y = 160;
 int bomb_x = cannon_x;
 int bomb_y = cannon_y;
 bool bombShow = false;
-char cannon[45] = "E:\\newproject\\cannon\\cannon1.bmp";
-char bomb[45] = "E:\\newproject\\cannon\\bomb1.bmp";
+char cannon[45] = "cannon\\cannon1.bmp";
+char bomb[45] = "cannon\\bomb1.bmp";
 bool bombCollusion = false;
 char bomCollusion[3][40] = {"cannon\\collusion10.bmp", "cannon\\collusion20.bmp", "cannon\\collusion30.bmp"};
-char damagedCannon[45] = "E:\\newproject\\cannon\\damaged_cannon.bmp";
+char damagedCannon[45] = "cannon\\damaged_cannon.bmp";
 bool cannonShow = true;
 bool cannonDamagedShow = false;
 
 // grenade
-char grenadeimg[60] = "E:\\newproject\\grenade\\grenade2.bmp";
+char grenadeimg[60] = "grenade\\grenade2.bmp";
 bool grenadeShow = false;
 
-char throwgren[8][20] = {"grenade\\1.bmp", "grenade\\2.bmp", "grenade\\3.bmp", "grenade\\4.bmp", "grenade\\5.bmp", "grenade\\6.bmp", "grenade\\7.bmp", "grenade\\8.bmp"};
+// there is no grenade\1.bmp, so the throw animation is frames 2 to 8
+char throwgren[7][20] = {"grenade\\2.bmp", "grenade\\3.bmp", "grenade\\4.bmp", "grenade\\5.bmp", "grenade\\6.bmp", "grenade\\7.bmp", "grenade\\8.bmp"};
 
 int cannonHP = 2;
 int grenade_x = heroCorX + 200;
@@ -103,14 +130,14 @@ bool isThrowingGrenade = false;
 int grenadeFrameCounter = 0;
 
 // health kit
-char crate[40] = "E:\\newproject\\special\\crate.bmp";
+char crate[40] = "special\\crate.bmp";
 int crate_x = 0;
 int crate_y = screenHeight;
 bool crateShow = false;
 
 // enemy
-char enemyimg[7][50] = {"E:\\newproject\\HeroMovement\\Walk\\6N.bmp", "E:\\newproject\\HeroMovement\\Walk\\5N.bmp", "E:\\newproject\\HeroMovement\\Walk\\4N.bmp", "E:\\newproject\\HeroMovement\\Walk\\3N.bmp", "E:\\newproject\\HeroMovement\\Walk\\2N.bmp", "E:\\newproject\\HeroMovement\\Walk\\1N.bmp", "E:\\newproject\\HeroMovement\\Walk\\0N.bmp"};
-char Rightenemyimg[7][50] = {"E:\\newproject\\HeroMovement\\Walk\\6NR.bmp", "E:\\newproject\\HeroMovement\\Walk\\5NR.bmp", "E:\\newproject\\HeroMovement\\Walk\\4NR.bmp", "E:\\newproject\\HeroMovement\\Walk\\3NR.bmp", "E:\\newproject\\HeroMovement\\Walk\\2NR.bmp", "E:\\newproject\\HeroMovement\\Walk\\1NR.bmp", "E:\\newproject\\HeroMovement\\Walk\\0NR.bmp"};
+char enemyimg[7][50] = {"HeroMovement\\Walk\\6N.bmp", "HeroMovement\\Walk\\5N.bmp", "HeroMovement\\Walk\\4N.bmp", "HeroMovement\\Walk\\3N.bmp", "HeroMovement\\Walk\\2N.bmp", "HeroMovement\\Walk\\1N.bmp", "HeroMovement\\Walk\\0N.bmp"};
+char Rightenemyimg[7][50] = {"HeroMovement\\Walk\\6NR.bmp", "HeroMovement\\Walk\\5NR.bmp", "HeroMovement\\Walk\\4NR.bmp", "HeroMovement\\Walk\\3NR.bmp", "HeroMovement\\Walk\\2NR.bmp", "HeroMovement\\Walk\\1NR.bmp", "HeroMovement\\Walk\\0NR.bmp"};
 char enemy_shoot[30] = "HeroMovement\\Walk\\shot.bmp";
 struct enemyall
 {
@@ -131,8 +158,8 @@ int bullet_y;
 int bulletSpeed = 65;
 bool bulletShow = false;
 
-char lasergun[40] = "E:\\newproject\\special\\laser.bmp";
-char laserbullet[40] = "E:\\newproject\\special\\laserbullet.bmp";
+char lasergun[40] = "special\\laser.bmp";
+char laserbullet[40] = "special\\laserbullet.bmp";
 int lasergun_x = 0;
 int lasergun_y = 0;
 bool lasergunShow = false;
@@ -141,7 +168,7 @@ bool laserGunDropped = false;
 
 enemyall enemy[ENEMYNUMBER];
 
-char player_dead[5][45] = {"E:\\newproject\\HeroMovement\\dead\\1N.bmp", "E:\\newproject\\HeroMovement\\dead\\2N.bmp", "E:\\newproject\\HeroMovement\\dead\\3N.bmp", "E:\\newproject\\HeroMovement\\dead\\4N.bmp", "E:\\newproject\\HeroMovement\\dead\\5N.bmp"};
+char player_dead[5][45] = {"HeroMovement\\dead\\1N.bmp", "HeroMovement\\dead\\2N.bmp", "HeroMovement\\dead\\3N.bmp", "HeroMovement\\dead\\4N.bmp", "HeroMovement\\dead\\5N.bmp"};
 int deathFrameCounter = 0;
 
 void enemyMovement()
@@ -160,7 +187,7 @@ void enemyMovement()
 
 char background[30] = "HeroMovement\\BG\\War2.bmp";
 
-char bullet[50] = "E:\\newproject\\bullet\\newBullet.bmp";
+char bullet[50] = "bullet\\newBullet.bmp";
 int kill = 0;
 
 void read_high_scores()
@@ -169,7 +196,8 @@ void read_high_scores()
     if (fp != NULL)
     {
         length = 0;
-        while (fscanf(fp, "%s %d", high_score[length].myname, &high_score[length].score) != EOF && length < MAX_HIGH_SCORES)
+        // check the count first so we never read past the array, and %29s so a long name can't overflow myname
+        while (length < MAX_HIGH_SCORES && fscanf(fp, "%29s %d", high_score[length].myname, &high_score[length].score) == 2)
         {
             length++;
         }
@@ -200,7 +228,7 @@ void write_high_scores()
 
 void add_new_score()
 {
-    int pos = -1;
+    int pos = length;
     for (int i = 0; i < length; i++)
     {
         if (high_score[i].score < kill)
@@ -209,39 +237,46 @@ void add_new_score()
             break;
         }
     }
-    if (pos == -1 && length < MAX_HIGH_SCORES)
+    if (pos >= MAX_HIGH_SCORES)
     {
-        pos = length;
+        return; // not in the top 5
+    }
+
+    // the list grows until it is full; after that the last score drops off
+    if (length < MAX_HIGH_SCORES)
+    {
         length++;
     }
-
-    if (pos != -1)
+    for (int i = length - 1; i > pos; i--)
     {
-        for (int i = length - 1; i > pos; i--)
-        {
-            high_score[i] = high_score[i - 1];
-        }
-        strcpy(high_score[pos].myname, userInput);
-        high_score[pos].score = kill;
+        high_score[i] = high_score[i - 1];
     }
+    strcpy(high_score[pos].myname, userInput);
+    high_score[pos].score = kill;
 }
 
+// kept above y = 300 so it stays visible when the window is taller than the screen (laptops / display scaling)
 void show_leaderboard()
 {
     iSetColor(255, 0, 0);
-    iText(100, 300, "Enter your name: ", GLUT_BITMAP_TIMES_ROMAN_24);
 
     if (inputMode)
     {
-        iText(400, 300, userInput, GLUT_BITMAP_TIMES_ROMAN_24);
+        iText(100, 560, "Enter your name: ", GLUT_BITMAP_TIMES_ROMAN_24);
+        iText(400, 560, userInput, GLUT_BITMAP_TIMES_ROMAN_24);
     }
     else
     {
-        char displayText[100];
-        sprintf(displayText, "Name: %s, Score: %d", userInput, kill);
-        iText(100, 250, displayText, GLUT_BITMAP_TIMES_ROMAN_24);
+        iText(100, 560, "TOP 5 SCORES", GLUT_BITMAP_TIMES_ROMAN_24);
 
-        int y = 200;
+        char displayText[100];
+        if (userInput[0] != '\0') // only after a game where the player entered a name
+        {
+            sprintf(displayText, "Name: %s, Score: %d", userInput, kill);
+            iText(100, 520, displayText, GLUT_BITMAP_TIMES_ROMAN_24);
+        }
+
+        int y = 480;
         for (int i = 0; i < length; i++)
         {
             char scoreText[100];
@@ -249,6 +284,7 @@ void show_leaderboard()
             iText(100, y, scoreText, GLUT_BITMAP_TIMES_ROMAN_24);
             y -= 30;
         }
+        iText(100, 320, "PRESS 'B' TO GO BACK", GLUT_BITMAP_TIMES_ROMAN_24);
     }
 }
 
@@ -334,7 +370,7 @@ struct enemyBullet
 };
 
 enemyBullet enemyBullets[ENEMYNUMBER];
-char enemyBulletImage[50] = "E:\\newproject\\bullet\\enemy_bullet.bmp";
+char enemyBulletImage[50] = "bullet\\enemy_bullet.bmp";
 int enemyBulletSpeed = 20;
 
 void enemyShoot()
@@ -365,19 +401,10 @@ void stage1moveEnemyBullets()
             if (enemyBullets[i].enemybulletShow)
             {
                 enemyBullets[i].enemybullet_x -= enemyBulletSpeed;
-                
-                int bulletLeft = enemyBullets[i].enemybullet_x;
-                int bulletRight = bulletLeft + 20; 
-                int bulletTop = enemyBullets[i].enemybullet_y + 20;
-                int bulletBottom = enemyBullets[i].enemybullet_y;
-                
+
                 int playerLeft = heroCordinateX + 150;
-                int playerRight = playerLeft + 100; 
-                int playerTop = heroCordinateY + heroJumpCordinate + 280; 
-                int playerBottom = heroCorY;
-                
-                printf("Bullet Left: %d, Bullet Right: %d, Player Left: %d, Player Right: %d\n", bulletLeft, bulletRight, playerLeft, playerRight);
-                printf("Bullet Bottom: %d, Bullet Top: %d, Player Bottom: %d, Player Top: %d\n", bulletBottom, bulletTop, playerBottom, playerTop);
+                int playerRight = playerLeft + 100;
+                int playerTop = heroCordinateY + heroJumpCordinate + 280;
 
                 if (playerVisible && !sit &&
                     playerRight >= enemyBullets[i].enemybullet_x && playerLeft <= enemyBullets[i].enemybullet_x  &&
@@ -448,19 +475,12 @@ void stage1moveEnemyBullets()
 }
 */
 
+// timer: moves the death animation forward one frame (iDraw draws player_dead[deathFrameCounter])
 void dead()
 {
-    if (playerHP <= 0)
+    if (playerHP <= 0 && deathFrameCounter < 4)
     {
-        if (deathFrameCounter < 5)
-        {
-            iShowBMP2(heroCorX, heroCorY, player_dead[deathFrameCounter], 0);
-            deathFrameCounter++;
-        }
-        if (deathFrameCounter == 5)
-        {
-            iShowBMP2(heroCorX, heroCorY, player_dead[4], 0);
-        }
+        deathFrameCounter++;
     }
 }
 
@@ -478,7 +498,6 @@ void cannongun()
         if (bombShow)
         {
             bomb_x -= 20;
-            int playerTop = heroCordinateY + heroJumpCordinate + 50;
             int playerBottom = heroCordinateY + heroJumpCordinate;
 
             if ((bomb_x >= heroCorX + 50 && bomb_x <= heroCorX + 200) && (playerBottom < 300))
@@ -488,7 +507,6 @@ void cannongun()
                 bombShow = false;
                 bombCollusion = true;
             }
-            printf("bx%d by%d hb%d\n", bomb_x, bomb_y, playerBottom);
             if (bomb_x < 0)
             {
                 bombShow = false;
@@ -515,7 +533,7 @@ void GrenadeThrow()
 {
     if (isThrowingGrenade)
     {
-        if (grenadeFrameCounter < 8)
+        if (grenadeFrameCounter < 7)
         {
             iShowBMP2(heroCorX, heroCorY, throwgren[grenadeFrameCounter], 0);
             grenadeFrameCounter++;
@@ -553,7 +571,6 @@ void cannondamage()
             bombShow = false;
         }
     }
-    printf("cannon_x: %d, cannon_y: %d, grenade_x: %d, grenade_y: %d\n", cannon_x, cannon_y, grenade_x, grenade_y);
 }
 
 void throwGrenade()
@@ -659,7 +676,7 @@ int supplyCrate_y = 200;
 int stage2 = 0;
 bool stage2EnemiesShow = false;
 
-char bombCollision[3][40] = {"E:\\newproject\\cannon\\collusion10.bmp", "E:\\newproject\\cannon\\collusion20.bmp", "E:\\newproject\\cannon\\collusion30.bmp"};
+char bombCollision[3][40] = {"cannon\\collusion10.bmp", "cannon\\collusion20.bmp", "cannon\\collusion30.bmp"};
 int stage2StartTime = 0;
 bool stage2Ready = false;
 bool flagnew = false;
@@ -795,18 +812,33 @@ void updateStageTransition()
     }
 }
 
+#define ENEMY_WIDTH 140
+
 void movemyBulletstage2()
 {
     if (bulletShow)
     {
+        int oldBullet_x = bullet_x;
         bullet_x += bulletSpeed * bulletDirection;
-        printf("Bullet at x: %d, direction: %d\n", bullet_x, bulletDirection);
 
         for (int i = 0; i < ENEMYNUMBER_STAGE2; i++)
         {
             if (enemy2[i].enemyShow && enemy2[i].enemy_x >= 0 && enemy2[i].enemy_x <= screenWidth)
             {
-                if ((bulletDirection == 1 && bullet_x >= enemy2[i].enemy_x) || (bulletDirection == -1 && bullet_x <= enemy2[i].enemy_x))
+                // only hit an enemy the bullet passed through this frame, so enemies behind the player are safe
+                int enemyLeft = enemy2[i].enemy_x;
+                int enemyRight = enemy2[i].enemy_x + ENEMY_WIDTH;
+                bool hit;
+                if (bulletDirection == 1)
+                {
+                    hit = oldBullet_x <= enemyRight && bullet_x >= enemyLeft;
+                }
+                else
+                {
+                    hit = oldBullet_x >= enemyLeft && bullet_x <= enemyRight;
+                }
+
+                if (hit)
                 {
                     enemy2[i].hitCounter++;
                     bulletShow = false;
@@ -858,6 +890,12 @@ int bossIndex = 0;
 bool bossMoving = true;
 bool shootingLowerBullet = true;
 char bossdead[30] = "masterchief\\chiefdead.bmp";
+
+// The boss images are only about as tall as the player, so draw them 1.5x bigger.
+// Each image also has some empty space under the feet (in pixels, per frame); it is
+// subtracted when drawing so the boss stands on the ground instead of floating.
+#define BOSS_SCALE 1.5
+int bossFeet[6] = {25, 38, 43, 16, 25, 22};
 void setMC();
 void checkAndStartStage3();
 void moveMC();
@@ -868,7 +906,7 @@ void moveMCBullets();
 void setMC()
 {
     boss_x = screenWidth + 500;
-    boss_y = 200;
+    boss_y = 200; // ground level, same as the player
     bossShow = true;
     bossMoving = true;
 }
@@ -886,7 +924,8 @@ void checkAndStartStage3()
 
 void checkBossCollision()
 {
-    if (bulletShow && bullet_x >= boss_x - 100 && bullet_x <= boss_x + 200 && bullet_y >= boss_y && bullet_y <= boss_y + 300)
+    // the scaled boss covers about 330 x 360 pixels from (boss_x, boss_y)
+    if (bulletShow && bullet_x >= boss_x && bullet_x <= boss_x + 330 && bullet_y >= boss_y && bullet_y <= boss_y + 360)
     {
         bossHP -= 10;
         bulletShow = false;
@@ -956,6 +995,16 @@ void moveMC()
 {
     if (bossShow)
     {
+        // draw the boss while it walks in too, not only after it stops
+        glPixelZoom(BOSS_SCALE, BOSS_SCALE);
+        iShowBMP2(boss_x, boss_y - (int)(bossFeet[bossIndex] * BOSS_SCALE), masterchief[bossIndex], 0);
+        glPixelZoom(1, 1);
+        bossIndex++;
+        if (bossIndex >= 6)
+        {
+            bossIndex = 0;
+        }
+
         if (bossMoving)
         {
             boss_x -= 10;
@@ -966,13 +1015,6 @@ void moveMC()
         }
         else
         {
-            iShowBMP2(boss_x, boss_y, masterchief[bossIndex], 0);
-            bossIndex++;
-            if (bossIndex >= 6)
-            {
-                bossIndex = 0;
-            }
-
             if (!bossAmmoShow)
             {
                 bossShoot();
@@ -994,31 +1036,101 @@ void endgame()
 
     if (bossDefeated && !finished)
     {
-        PlaySound("E:\\newproject\\Music\\WhatIHaveDone1.wav", NULL, SND_FILENAME | SND_ASYNC);
+        playMusic(MUSIC_ENDING);
         finished = true;
         bossDeathTime = currentTime;
     }
 
+    // 10 seconds after the boss dies, switch to the credits screen (gamestate 7)
     if (finished && !endgameImageShown && currentTime - bossDeathTime >= 10000)
     {
-        iShowBMP(0, 0, complete);
         endgameImageShown = true;
+        gamestate = 7;
     }
 }
 
-int counter = 1;
 int count2 = 1;
+
+// puts everything back to how it was at the start, so PLAY works again after winning or dying
+void resetGame()
+{
+    userInput[0] = '\0';
+    inputIndex = 0;
+    inputMode = false;
+
+    playerHP = 100;
+    kill = 0;
+    isfacingRight = true;
+    bulletDirection = 1;
+    heroCorX = heroCordinateX;
+    heroCorY = heroCordinateY;
+    heroIndex = 0;
+    standPosition = true;
+    standCounter = 0;
+    jump = false;
+    jumpUp = false;
+    heroJumpCordinate = 0;
+    sit = false;
+    playerVisible = true;
+    deathFrameCounter = 0;
+    bulletShow = false;
+
+    // stage 1
+    currentPhase = 1;
+    enemiesKilledInPhase = 0;
+    setEnemyVariables();
+    cannonHP = 2;
+    cannonShow = true;
+    cannonDamagedShow = false;
+    bombShow = false;
+    bombCollusion = false;
+    grenadeShow = false;
+    isThrowingGrenade = false;
+    grenadeFrameCounter = 0;
+    crateShow = false;
+    cr = 0;
+    lasergunShow = false;
+    laserGunEquipped = false;
+    laserGunDropped = false;
+
+    // stage 2
+    supplyCrateShow = false;
+    flagnew = false;
+    stage2 = 0;
+    stage2Ready = false;
+    stage2EnemiesShow = false;
+    stage2kill = 0;
+    stage2enemy = 0;
+    for (int i = 0; i < ENEMYNUMBER_STAGE2; i++)
+    {
+        enemy2[i].enemyShow = false;
+    }
+
+    // stage 3
+    stage3Ready = false;
+    bossShow = false;
+    bossHP = 500;
+    bossDefeated = false;
+    bossAmmoShow = false;
+    bossIndex = 0;
+    bossMoving = true;
+    shootingLowerBullet = true;
+    finished = false;
+    endgameImageShown = false;
+    count2 = 1;
+}
 
 void iDraw()
 {
     iClear();
-    printf("KILLLLLLLLLLLL %d\n", kill);
-    if (playerHP <= 0)
+    if (playerHP <= 0 && gamestate == 0)
     {
-        gamestate = 5;
+        gamestate = 5;    // game over screen
+        inputMode = true; // ask for the player's name for the leaderboard
     }
     if (gamestate == -1)
     {
+        playMusic(MUSIC_MENU);
         iShowBMP(0, 0, homemenu);
         for (int i = 0; i < 4; i++)
         {
@@ -1028,14 +1140,23 @@ void iDraw()
     else if (gamestate == 0)
     {
         char displaytext3[100];
-        Menumusic = false;
-        if (!Menumusic)
+        if (!finished)
         {
-            PlaySound(0, 0, 0);
+            playMusic(MUSIC_NONE); // after the boss dies the ending music keeps playing
         }
 
         iShowBMP(0, 0, background);
         enemyMovement();
+
+        // drawn early so the boss (who stops where the cannon stands) is drawn in front of the wreck
+        if (cannonShow)
+        {
+            iShowBMP2(cannon_x, cannon_y, cannon, 0);
+        }
+        else if (cannonDamagedShow)
+        {
+            iShowBMP2(cannon_x, cannon_y, damagedCannon, 0);
+        }
 
         iSetColor(255, 255, 255);
         iText(10, 1050, "PRESS 'B' TO PAUSE", GLUT_BITMAP_TIMES_ROMAN_24);
@@ -1088,11 +1209,8 @@ void iDraw()
                 {
                     inputMode = true;
                     count2++;
-                    endgame();
                 }
-
-                read_high_scores();
-                show_leaderboard();
+                endgame(); // called every frame so it can switch to the credits after 10 seconds
             }
         }
 
@@ -1104,15 +1222,6 @@ void iDraw()
             }
         }
         stage1moveEnemyBullets();
-
-        if (cannonShow)
-        {
-            iShowBMP2(cannon_x, cannon_y, cannon, 0);
-        }
-        else if (cannonDamagedShow)
-        {
-            iShowBMP2(cannon_x, cannon_y, damagedCannon, 0);
-        }
 
         if (bombShow)
         {
@@ -1158,9 +1267,13 @@ void iDraw()
                     standPosition = true;
                 }
             }
-            else
+            else if (isfacingRight)
             {
                 iShowBMP2(heroCorX, heroCorY, heroStand, 0);
+            }
+            else
+            {
+                iShowBMP2(heroCorX, heroCorY, leftwalk[0], 0); // there is no left standing image
             }
         }
 
@@ -1184,6 +1297,12 @@ void iDraw()
             sprintf(displaytext2, "Health bar: %d", playerHP);
             iText(900, 1050, displaytext2, GLUT_BITMAP_TIMES_ROMAN_24);
         }
+
+        if (bossDefeated)
+        {
+            read_high_scores();
+            show_leaderboard(); // drawn last so the player sprite doesn't cover it
+        }
     }
     else if (gamestate == 1)
     {
@@ -1202,33 +1321,23 @@ void iDraw()
     }
     else if (gamestate == 5)
     {
-        iShowBMP(0, 0, homemenu);
-        Menumusic = true;
-        if (Menumusic)
-        {
-            PlaySound("E:\\newproject\\Music\\Menu_BGM.wav", NULL, SND_LOOP | SND_ASYNC);
-        }
-
+        // game over: the dead player, name entry, then the leaderboard
+        playMusic(MUSIC_MENU);
         iShowBMP(0, 0, background);
+        iShowBMP2(heroCorX, heroCorY, player_dead[deathFrameCounter], 0);
 
-        playerVisible = false;
-        dead();
-        if (counter == 1)
-        {
-            inputMode = true;
-            counter++;
-        }
-        read_high_scores();
-        show_leaderboard();
-
-        gamestate = 2;
-    }
-
-    printf("\nPlayer Health Remaining is: %d\n", playerHP);
-    if (playerHP <= 0)
-    {
         iSetColor(255, 0, 0);
         iText(900, 1050, "DEAD", GLUT_BITMAP_TIMES_ROMAN_24);
+
+        read_high_scores();
+        show_leaderboard();
+    }
+    else if (gamestate == 7)
+    {
+        // credits after the boss is defeated
+        iShowBMP(0, 0, complete);
+        read_high_scores();
+        show_leaderboard();
     }
 }
 
@@ -1237,27 +1346,48 @@ void iMouseMove(int mx, int my)
     printf("x = %d, y= %d\n", mx, my);
 }
 
+#define BUTTON_WIDTH 200
+#define BUTTON_HEIGHT 60
+
 void iMouse(int button, int state, int mx, int my)
 {
-    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && gamestate == -1) // the buttons only exist on the menu
     {
-        for (int i = 0; i < 3; i++)
+        // Windows shrinks the window when the screen is smaller than 1920x1080 (or uses display scaling).
+        // The button positions get scaled to the window but the 200x60 images don't, so compare in window pixels.
+        int winWidth = glutGet(GLUT_WINDOW_WIDTH);
+        int winHeight = glutGet(GLUT_WINDOW_HEIGHT);
+        int px = mx;                            // iGraphics gives x in window pixels
+        int py = my - screenHeight + winHeight; // and y as (screenHeight - pixel row from the top)
+
+        for (int i = 0; i < 4; i++)
         {
-            if (mx >= 39 && mx <= 232 && my >= 561 && my <= 618)
-            { // 200x60 size button
-                gamestate = 0;
+            int left = bCordinate[i].x * winWidth / screenWidth;
+            int bottom = bCordinate[i].y * winHeight / screenHeight;
+            if (px < left || px > left + BUTTON_WIDTH || py < bottom || py > bottom + BUTTON_HEIGHT)
+            {
+                continue;
             }
-            if (mx >= 39 && mx <= 232 && my >= 445 && my <= 502)
-            { // 200x60 size button
-                gamestate = 1;
-            }
-            if (mx >= 39 && mx <= 232 && my >= 329 && my <= 386)
-            { // 200x60 size button
-                gamestate = 2;
-            }
-            if (mx >= 39 && mx <= 232 && my >= 677 && my <= 734)
+
+            if (i == 0) // INSTRUCTIONS
             {
                 gamestate = 6;
+            }
+            else if (i == 1) // PLAY
+            {
+                if (playerHP <= 0 || bossDefeated)
+                {
+                    resetGame(); // last game is over, start a new one
+                }
+                gamestate = 0;
+            }
+            else if (i == 2) // EXIT
+            {
+                gamestate = 1;
+            }
+            else // LEADER BOARD
+            {
+                gamestate = 2;
             }
         }
     }
@@ -1273,11 +1403,53 @@ bool directionRight = true;
 
 void iKeyboard(unsigned char key)
 {
+    if (inputMode)
+    {
+        // while the player types their name, keys only go to the name (so 'q' or 'b' in a name doesn't quit)
+        if (key == '\r')
+        {
+            if (inputIndex == 0)
+            {
+                strcpy(userInput, "Player"); // an empty name would break Score.txt
+                inputIndex = strlen(userInput);
+            }
+            inputMode = false;
+            read_high_scores();
+            add_new_score();
+            write_high_scores();
+        }
+        else if (key == '\b')
+        {
+            if (inputIndex > 0)
+            {
+                inputIndex--;
+                userInput[inputIndex] = '\0';
+            }
+        }
+        else if (key >= ' ' && key <= '~' && inputIndex < MAX_NAME_LENGTH - 1)
+        {
+            userInput[inputIndex] = (key == ' ') ? '_' : key; // Score.txt is split by spaces
+            inputIndex++;
+            userInput[inputIndex] = '\0';
+        }
+        return;
+    }
+
     if (key == 'q')
     {
         exit(0);
     }
-    else if (key == 'w')
+    if (key == 'b' && (gamestate == 0 || gamestate == 2 || gamestate == 5 || gamestate == 6 || gamestate == 7))
+    {
+        gamestate = -1;
+        return;
+    }
+    if (gamestate != 0)
+    {
+        return; // the controls below only work while playing
+    }
+
+    if (key == 'w')
     {
         if (!jump)
         {
@@ -1401,34 +1573,15 @@ void iKeyboard(unsigned char key)
 
         standPosition = false;
     }
-    else if (key == 'b' && (gamestate == 2 || gamestate == 0 || gamestate == 6))
-    {
-        gamestate = -1;
-    }
 
-    if (inputMode)
+    // keep the player on the screen (the body is drawn 177 to 334 pixels from heroCorX)
+    if (heroCorX < 0)
     {
-        if (key == '\r')
-        {
-            inputMode = false;
-            read_high_scores();
-            add_new_score();
-            write_high_scores();
-        }
-        else if (key == '\b')
-        {
-            if (inputIndex > 0)
-            {
-                inputIndex--;
-                userInput[inputIndex] = '\0';
-            }
-        }
-        else if (inputIndex < MAX_NAME_LENGTH - 1)
-        {
-            userInput[inputIndex] = key;
-            inputIndex++;
-            userInput[inputIndex] = '\0';
-        }
+        heroCorX = 0;
+    }
+    if (heroCorX > screenWidth - 335)
+    {
+        heroCorX = screenWidth - 335;
     }
 }
 
@@ -1490,7 +1643,7 @@ int main()
     iSetTimer(60, change);
     iSetTimer(100, change_enemy);
     iSetTimer(1000, enemyShoot);
-    iSetTimer(1000, dead);
+    iSetTimer(200, dead);
     iSetTimer(50, cannongun);
 
     int sum = 100;
@@ -1501,14 +1654,7 @@ int main()
         sum += 150;
     }
     // score = kill * 10;
-    if (Menumusic)
-    {
-        PlaySound("E:\\newproject\\Music\\Menu_BGM.wav", NULL, SND_LOOP | SND_ASYNC);
-    }
-    if (finished)
-    {
-        PlaySound("E:\\newproject\\Music\\WhatIHaveDone1.wav", NULL, SND_LOOP | SND_ASYNC);
-    }
+    playMusic(MUSIC_MENU);
     // place your own initialization codes here.
     iInitialize(screenWidth, screenHeight, "LookingForSotruz");
     return 0;
